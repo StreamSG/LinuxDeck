@@ -1,0 +1,14 @@
+[Unit]
+Description=LinuxDeck — Open-Source Loupedeck & Razer Stream Controller Daemon
+After=graphical-session.target pipewire.service pulseaudio.service
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/linuxdeck --tray
+Restart=on-failure
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

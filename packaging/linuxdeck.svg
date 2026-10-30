@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#141820"/>
+      <stop offset="100%" stop-color="#0a0c10"/>
+    </linearGradient>
+    <linearGradient id="neonGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00FF66"/>
+      <stop offset="100%" stop-color="#00B8FF"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer chassis -->
+  <rect x="12" y="28" width="232" height="200" rx="26" fill="url(#bgGrad)" stroke="url(#neonGrad)" stroke-width="5"/>
+  <!-- Left dials -->
+  <circle cx="38" cy="68" r="13" fill="#202634" stroke="#00FF66" stroke-width="3"/>
+  <circle cx="38" cy="112" r="13" fill="#202634" stroke="#00E5FF" stroke-width="3"/>
+  <circle cx="38" cy="156" r="13" fill="#202634" stroke="#A855F7" stroke-width="3"/>
+  <!-- Right dials -->
+  <circle cx="218" cy="68" r="13" fill="#202634" stroke="#FF2A85" stroke-width="3"/>
+  <circle cx="218" cy="112" r="13" fill="#202634" stroke="#FF9900" stroke-width="3"/>
+  <circle cx="218" cy="156" r="13" fill="#202634" stroke="#00FF66" stroke-width="3"/>
+  <!-- 4x3 Touch Grid -->
+  <g fill="#19202c" stroke="#2c374b" stroke-width="2">
+    <rect x="64" y="48" width="28" height="28" rx="6" stroke="#00FF66"/>
+    <rect x="98" y="48" width="28" height="28" rx="6" stroke="#00B8FF"/>
+    <rect x="132" y="48" width="28" height="28" rx="6"/>
+    <rect x="166" y="48" width="28" height="28" rx="6"/>
+
+    <rect x="64" y="84" width="28" height="28" rx="6"/>
+    <rect x="98" y="84" width="28" height="28" rx="6" stroke="#A855F7"/>
+    <rect x="132" y="84" width="28" height="28" rx="6" stroke="#FF2A85"/>
+    <rect x="166" y="84" width="28" height="28" rx="6"/>
+
+    <rect x="64" y="120" width="28" height="28" rx="6"/>
+    <rect x="98" y="120" width="28" height="28" rx="6"/>
+    <rect x="132" y="120" width="28" height="28" rx="6"/>
+    <rect x="166" y="120" width="28" height="28" rx="6" stroke="#00FF66"/>
+  </g>
+  <!-- Bottom physical buttons -->
+  <g fill="#181e29" stroke-width="2.5">
+    <circle cx="44" cy="198" r="9" stroke="#FFFFFF"/>
+    <circle cx="68" cy="198" r="9" stroke="#00FF66"/>
+    <circle cx="92" cy="198" r="9" stroke="#FF3B30"/>
+    <circle cx="116" cy="198" r="9" stroke="#00B8FF"/>
+    <circle cx="140" cy="198" r="9" stroke="#FF9900"/>
+    <circle cx="164" cy="198" r="9" stroke="#A855F7"/>
+    <circle cx="188" cy="198" r="9" stroke="#FF2A85"/>
+    <circle cx="212" cy="198" r="9" stroke="#30D158"/>
+  </g>
+</svg>

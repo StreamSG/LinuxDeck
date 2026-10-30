@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=LinuxDeck
+GenericName=Loupedeck & Razer Stream Controller Suite
+Comment=Open-source Linux driver, audio mixer, OBS controller, and telemetry deck for Loupedeck Live & Razer Stream Controller
+Exec=linuxdeck
+Icon=linuxdeck
+Terminal=false
+Categories=AudioVideo;Audio;System;HardwareSettings;Qt;
+Keywords=loupedeck;razer;stream;controller;deck;pipewire;obs;
+StartupNotify=true
+StartupWMClass=LinuxDeck
