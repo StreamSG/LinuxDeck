@@ -45,22 +45,34 @@
 
 ---
 
-## 🚀 Quick Start Installation
+## 🚀 Installation
 
-Clone the repository and run the one-step installer:
+Download the latest release from the [**GitHub Releases page**](https://github.com/StreamSG/LinuxDeck/releases/latest):
 
+### Option 1: Debian / Ubuntu / Linux Mint / Pop!_OS (`.deb` Installer)
+Installs `/usr/bin/linuxdeck`, the desktop application launcher & icon, `systemd` user service, and `/lib/udev/rules.d/70-linuxdeck.rules` automatically:
+```bash
+sudo apt install ./linuxdeck_1.0.0_amd64.deb
+```
+Then launch **LinuxDeck** from your desktop Application Menu or run `linuxdeck`.
+
+### Option 2: Portable Standalone Binary (Any `x86_64` Linux Distro)
+No Python or dependencies required — everything (Python, PyQt6, Pillow, NumPy, and drivers) is compiled into a single binary. On first launch, if `/dev/ttyACM*` permissions are locked, it automatically prompts once via Polkit (`pkexec`) to install the udev rules:
+```bash
+chmod +x LinuxDeck-1.0.0-linux-x86_64
+./LinuxDeck-1.0.0-linux-x86_64
+```
+
+### Option 3: Install from Source
 ```bash
 git clone https://github.com/StreamSG/LinuxDeck.git
 cd LinuxDeck
 ./install.sh
 ```
-
-What `./install.sh` does:
-1. Creates a Python virtual environment (`.venv`) and installs `linuxdeck` with all dependencies (`pyserial`, `websockets`, `numpy`, `Pillow`, `psutil`, `PyQt6`).
-2. Installs the `linuxdeck` CLI entrypoint to `~/.local/bin/linuxdeck`.
-3. Installs the desktop launcher (`~/.local/share/applications/linuxdeck.desktop`), SVG icon, and `systemd --user` service (`~/.config/systemd/user/linuxdeck.service`).
-4. Installs `/etc/udev/rules.d/70-linuxdeck.rules` so your user has non-root access to `/dev/ttyACM*` and `ModemManager` ignores the controller.
-5. Runs `linuxdeck --autoconfig` on first install to scan your PC and generate `~/.config/linuxdeck/config.json`.
+To compile the standalone binary and `.deb` package yourself:
+```bash
+./scripts/build-release.sh
+```
 
 ---
 

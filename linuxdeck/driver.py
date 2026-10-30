@@ -165,6 +165,46 @@ class LoupedeckDriver:
         self.on_touch: Optional[Callable[[TouchEvent], None]] = None
         self.on_swipe: Optional[Callable[[str], None]] = None
         self.on_connection_changed: Optional[Callable[[bool], None]] = None
+        self._udev_prompted: bool = False
+
+    def _auto_install_udev_rules(self, target_port: str) -> None:
+        """If the user runs a standalone AppImage/binary without udev rules installed, prompt once via pkexec."""
+        if self._udev_prompted:
+            return
+        self._udev_prompted = True
+        import shutil
+        import subprocess
+
+        if not shutil.which("pkexec"):
+            logger.warning("Permission denied on %s and pkexec not available to auto-install udev rules.", target_port)
+            return
+
+        rules_content = (
+            '# LinuxDeck — udev rules for Razer Stream Controller & Loupedeck devices\n'
+            'SUBSYSTEM=="tty", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0d06", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="usb", ATTR{idVendor}=="1532", ATTR{idProduct}=="0d06", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="tty", ATTRS{idVendor}=="1532", ATTRS{idProduct}=="0d09", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="usb", ATTR{idVendor}=="1532", ATTR{idProduct}=="0d09", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="tty", ATTRS{idVendor}=="2ec2", ATTRS{idProduct}=="0004", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="usb", ATTR{idVendor}=="2ec2", ATTR{idProduct}=="0004", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="tty", ATTRS{idVendor}=="2ec2", ATTRS{idProduct}=="0006", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="usb", ATTR{idVendor}=="2ec2", ATTR{idProduct}=="0006", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="tty", ATTRS{idVendor}=="2ec2", ATTRS{idProduct}=="0003", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+            'SUBSYSTEM=="usb", ATTR{idVendor}=="2ec2", ATTR{idProduct}=="0003", MODE="0666", GROUP="plugdev", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"\n'
+        )
+        cmd = (
+            f"printf %s {subprocess.list2cmdline([rules_content])} > /etc/udev/rules.d/70-linuxdeck.rules && "
+            "chmod 644 /etc/udev/rules.d/70-linuxdeck.rules && "
+            "udevadm control --reload-rules && "
+            "udevadm trigger --action=add --subsystem-match=tty && "
+            "udevadm trigger --action=add --subsystem-match=usb"
+        )
+        logger.info("Requesting Polkit permission to install /etc/udev/rules.d/70-linuxdeck.rules...")
+        try:
+            subprocess.run(["pkexec", "sh", "-c", cmd], check=False, timeout=60)
+            time.sleep(0.3)
+        except Exception as exc:
+            logger.warning("Auto-install udev rules failed: %s", exc)
 
     def _next_tx_id(self) -> int:
         self._tx_id = (self._tx_id % 255) + 1
@@ -180,6 +220,9 @@ class LoupedeckDriver:
 
         self.device_name = detected_name
         self.disconnect()
+
+        if os.path.exists(target_port) and not os.access(target_port, os.R_OK | os.W_OK):
+            self._auto_install_udev_rules(target_port)
 
         try:
             ser = serial.Serial(

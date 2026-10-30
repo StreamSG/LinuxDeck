@@ -8,8 +8,8 @@ import signal
 import sys
 import time
 
-from . import __version__
-from .controller import StreamControllerEngine
+from linuxdeck import __version__
+from linuxdeck.controller import StreamControllerEngine
 
 
 def main() -> int:
@@ -56,8 +56,8 @@ def main() -> int:
     )
 
     if args.autoconfig_only:
-        from .config import load_profile, CONFIG_PATH
-        from .autodiscover import discover_system_environment
+        from linuxdeck.config import load_profile, CONFIG_PATH
+        from linuxdeck.autodiscover import discover_system_environment
         env = discover_system_environment()
         load_profile(force_autoconfig=True)
         print(f"Auto-configured LinuxDeck profile saved to {CONFIG_PATH}")
@@ -87,7 +87,7 @@ def main() -> int:
         return 0
 
     from PyQt6.QtWidgets import QApplication
-    from .gui import StreamControllerMainWindow
+    from linuxdeck.gui import StreamControllerMainWindow
 
     app = QApplication(sys.argv)
     app.setApplicationName("LinuxDeck")
