@@ -190,7 +190,7 @@ class ScreenCanvasWidget(QWidget):
 
 
 def get_app_icon() -> QIcon:
-    """Load the LinuxDeck application icon across source, PyInstaller, and system installs."""
+    """Load the LinuxDeck application icon with pre-filtered multi-size pixmaps (16px..512px) for crisp tray/taskbar rendering."""
     candidates = []
     meipass = getattr(sys, "_MEIPASS", None)
     if meipass:
@@ -206,9 +206,20 @@ def get_app_icon() -> QIcon:
     ])
     for path in candidates:
         if os.path.exists(path):
-            icon = QIcon(path)
-            if not icon.isNull():
-                return icon
+            try:
+                pil_img = Image.open(path).convert("RGBA")
+                icon = QIcon()
+                for sz in (16, 22, 24, 32, 48, 64, 128, 256, 512):
+                    resized = pil_img.resize((sz, sz), Image.Resampling.LANCZOS)
+                    raw = resized.tobytes("raw", "RGBA")
+                    qimg = QImage(raw, sz, sz, sz * 4, QImage.Format.Format_RGBA8888).copy()
+                    icon.addPixmap(QPixmap.fromImage(qimg))
+                if not icon.isNull():
+                    return icon
+            except Exception:
+                icon = QIcon(path)
+                if not icon.isNull():
+                    return icon
     return QIcon.fromTheme("linuxdeck")
 
 
