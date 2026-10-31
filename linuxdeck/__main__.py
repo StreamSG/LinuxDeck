@@ -87,10 +87,12 @@ def main() -> int:
         return 0
 
     from PyQt6.QtWidgets import QApplication
-    from linuxdeck.gui import StreamControllerMainWindow
+    from linuxdeck.gui import StreamControllerMainWindow, get_app_icon
 
     app = QApplication(sys.argv)
     app.setApplicationName("LinuxDeck")
+    app.setDesktopFileName("linuxdeck")
+    app.setWindowIcon(get_app_icon())
     window = StreamControllerMainWindow(engine, start_minimized=args.tray)  # noqa: F841
 
     def _qt_sigint(*_args):

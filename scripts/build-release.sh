@@ -25,6 +25,7 @@ echo "[2/3] Compiling standalone single-file Linux executable (PyInstaller)..."
     --clean \
     --onefile \
     --name "LinuxDeck-${VERSION}-linux-x86_64" \
+    --add-data "${REPO_DIR}/linuxdeck/assets/linuxdeck.png:linuxdeck/assets" \
     --hidden-import "PyQt6.QtCore" \
     --hidden-import "PyQt6.QtGui" \
     --hidden-import "PyQt6.QtWidgets" \
@@ -45,6 +46,9 @@ mkdir -p \
     "${DEB_ROOT}/usr/bin" \
     "${DEB_ROOT}/usr/share/applications" \
     "${DEB_ROOT}/usr/share/icons/hicolor/scalable/apps" \
+    "${DEB_ROOT}/usr/share/icons/hicolor/512x512/apps" \
+    "${DEB_ROOT}/usr/share/icons/hicolor/256x256/apps" \
+    "${DEB_ROOT}/usr/share/pixmaps" \
     "${DEB_ROOT}/usr/lib/systemd/user" \
     "${DEB_ROOT}/lib/udev/rules.d"
 
@@ -52,9 +56,16 @@ cp "${DIST_DIR}/LinuxDeck-${VERSION}-linux-x86_64" "${DEB_ROOT}/usr/bin/linuxdec
 chmod 755 "${DEB_ROOT}/usr/bin/linuxdeck"
 
 cp "${REPO_DIR}/packaging/linuxdeck.svg" "${DEB_ROOT}/usr/share/icons/hicolor/scalable/apps/linuxdeck.svg"
-chmod 644 "${DEB_ROOT}/usr/share/icons/hicolor/scalable/apps/linuxdeck.svg"
+cp "${REPO_DIR}/packaging/linuxdeck.png" "${DEB_ROOT}/usr/share/icons/hicolor/512x512/apps/linuxdeck.png"
+cp "${REPO_DIR}/packaging/linuxdeck.png" "${DEB_ROOT}/usr/share/icons/hicolor/256x256/apps/linuxdeck.png"
+cp "${REPO_DIR}/packaging/linuxdeck.png" "${DEB_ROOT}/usr/share/pixmaps/linuxdeck.png"
+chmod 644 \
+    "${DEB_ROOT}/usr/share/icons/hicolor/scalable/apps/linuxdeck.svg" \
+    "${DEB_ROOT}/usr/share/icons/hicolor/512x512/apps/linuxdeck.png" \
+    "${DEB_ROOT}/usr/share/icons/hicolor/256x256/apps/linuxdeck.png" \
+    "${DEB_ROOT}/usr/share/pixmaps/linuxdeck.png"
 
-sed "s|^Exec=.*|Exec=/usr/bin/linuxdeck|g; s|^Icon=.*|Icon=linuxdeck|g" \
+sed "s|^Exec=.*|Exec=/usr/bin/linuxdeck|g; s|^Icon=.*|Icon=/usr/share/icons/hicolor/512x512/apps/linuxdeck.png|g" \
     "${REPO_DIR}/packaging/linuxdeck.desktop" > "${DEB_ROOT}/usr/share/applications/linuxdeck.desktop"
 chmod 644 "${DEB_ROOT}/usr/share/applications/linuxdeck.desktop"
 

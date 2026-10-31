@@ -189,6 +189,29 @@ class ScreenCanvasWidget(QWidget):
             self.key_triggered.emit(idx)
 
 
+def get_app_icon() -> QIcon:
+    """Load the LinuxDeck application icon across source, PyInstaller, and system installs."""
+    candidates = []
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        candidates.append(os.path.join(meipass, "linuxdeck", "assets", "linuxdeck.png"))
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates.extend([
+        os.path.join(here, "assets", "linuxdeck.png"),
+        os.path.join(here, "..", "packaging", "linuxdeck.png"),
+        os.path.expanduser("~/.local/share/icons/hicolor/512x512/apps/linuxdeck.png"),
+        os.path.expanduser("~/.local/share/icons/hicolor/256x256/apps/linuxdeck.png"),
+        "/usr/share/icons/hicolor/512x512/apps/linuxdeck.png",
+        "/usr/share/pixmaps/linuxdeck.png",
+    ])
+    for path in candidates:
+        if os.path.exists(path):
+            icon = QIcon(path)
+            if not icon.isNull():
+                return icon
+    return QIcon.fromTheme("linuxdeck")
+
+
 class StreamControllerMainWindow(QMainWindow):
     """Main PyQt6 window for configuring and monitoring LinuxDeck."""
 
@@ -198,6 +221,7 @@ class StreamControllerMainWindow(QMainWindow):
         self.signals = BridgeSignals()
 
         self.setWindowTitle("LinuxDeck — Open-Source Loupedeck & Razer Stream Controller")
+        self.setWindowIcon(get_app_icon())
         self.resize(1180, 740)
         self._apply_dark_theme()
 
@@ -478,16 +502,19 @@ class StreamControllerMainWindow(QMainWindow):
     def _setup_tray(self) -> None:
         if not QSystemTrayIcon.isSystemTrayAvailable():
             return
-        pix = QPixmap(32, 32)
-        pix.fill(QColor(0, 0, 0, 0))
-        p = QPainter(pix)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
-        p.setBrush(QColor(0, 255, 102))
-        p.setPen(QPen(QColor(15, 20, 28), 2))
-        p.drawEllipse(4, 4, 24, 24)
-        p.end()
+        app_icon = get_app_icon()
+        if app_icon.isNull():
+            pix = QPixmap(32, 32)
+            pix.fill(QColor(0, 0, 0, 0))
+            p = QPainter(pix)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            p.setBrush(QColor(0, 255, 102))
+            p.setPen(QPen(QColor(15, 20, 28), 2))
+            p.drawEllipse(4, 4, 24, 24)
+            p.end()
+            app_icon = QIcon(pix)
 
-        self.tray = QSystemTrayIcon(QIcon(pix), self)
+        self.tray = QSystemTrayIcon(app_icon, self)
         self.tray.setToolTip("LinuxDeck")
         menu = QMenu()
         act_show = QAction("Open LinuxDeck Control Center", self)

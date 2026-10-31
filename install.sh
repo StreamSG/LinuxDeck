@@ -33,17 +33,29 @@ exec "${VENV_DIR}/bin/python" -m linuxdeck "\$@"
 EOF
 chmod +x "${LOCAL_BIN}/linuxdeck"
 
-# 3. Install desktop entry, icon, and systemd user unit
-echo "[4/5] Installing desktop entry, icon, and systemd user service..."
-mkdir -p "${APPS_DIR}" "${ICON_DIR}" "${SYSTEMD_USER_DIR}"
+# 3. Install desktop entry, Desktop shortcut, icon, and systemd user unit
+echo "[4/5] Installing desktop entry, app icon, Desktop shortcut, and systemd user service..."
+ICON_512_DIR="${HOME}/.local/share/icons/hicolor/512x512/apps"
+ICON_256_DIR="${HOME}/.local/share/icons/hicolor/256x256/apps"
+mkdir -p "${APPS_DIR}" "${ICON_DIR}" "${ICON_512_DIR}" "${ICON_256_DIR}" "${SYSTEMD_USER_DIR}"
 cp "${REPO_DIR}/packaging/linuxdeck.svg" "${ICON_DIR}/linuxdeck.svg"
+cp "${REPO_DIR}/packaging/linuxdeck.png" "${ICON_512_DIR}/linuxdeck.png"
+cp "${REPO_DIR}/packaging/linuxdeck.png" "${ICON_256_DIR}/linuxdeck.png"
 
-sed "s|^Exec=.*|Exec=${LOCAL_BIN}/linuxdeck|g; s|^Icon=.*|Icon=${ICON_DIR}/linuxdeck.svg|g" \
+sed "s|^Exec=.*|Exec=${LOCAL_BIN}/linuxdeck|g; s|^Icon=.*|Icon=${ICON_512_DIR}/linuxdeck.png|g" \
     "${REPO_DIR}/packaging/linuxdeck.desktop" > "${APPS_DIR}/linuxdeck.desktop"
 chmod +x "${APPS_DIR}/linuxdeck.desktop"
 
+if [[ -d "${HOME}/Desktop" ]]; then
+    cp "${APPS_DIR}/linuxdeck.desktop" "${HOME}/Desktop/LinuxDeck.desktop"
+    chmod +x "${HOME}/Desktop/LinuxDeck.desktop"
+    command -v gio >/dev/null 2>&1 && gio set "${HOME}/Desktop/LinuxDeck.desktop" metadata::trusted true >/dev/null 2>&1 || true
+fi
+
 cp "${REPO_DIR}/packaging/linuxdeck.service" "${SYSTEMD_USER_DIR}/linuxdeck.service"
 systemctl --user daemon-reload >/dev/null 2>&1 || true
+command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database -q "${APPS_DIR}" >/dev/null 2>&1 || true
+command -v gtk-update-icon-cache >/dev/null 2>&1 && gtk-update-icon-cache -f -t "${HOME}/.local/share/icons/hicolor" >/dev/null 2>&1 || true
 
 # 4. Install udev rules if not already present
 if [[ -f "/etc/udev/rules.d/70-linuxdeck.rules" || -f "/etc/udev/rules.d/70-razer-stream-controller.rules" ]]; then
